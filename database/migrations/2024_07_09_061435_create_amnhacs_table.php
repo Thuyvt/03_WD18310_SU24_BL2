@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('amnhacs', function (Blueprint $table) {
             $table->increments('id');
             $table->string('ten', 50);
-            $table->integer('id_nhacsi')->unsigned();
+            $table->integer('id_nhacsi')->unsigned()->nullable();
             $table->foreign('id_nhacsi')->references('id')
                 ->on('nhacsis')
 //                ->onDelete('cascade')

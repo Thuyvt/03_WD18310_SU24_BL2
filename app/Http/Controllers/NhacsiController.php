@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class NhacsiController extends Controller
 {
@@ -30,7 +32,21 @@ class NhacsiController extends Controller
      */
     public function store(Request $request)
     {
-        //
+//        xử lý ảnh
+        if ($request->hasFile('image')) {
+            $url = Storage::put('nhacsi', $request->file('image'));
+        } else {
+            $url = '';
+        }
+        DB::table('nhacsis')->insert([
+            'ten' => $request->ten1,
+            'anh'=> $url,
+            'ngaysinh' => $request->ngaysinh,
+            'quequan'=> $request->quequan,
+            'created_at' => Carbon::now()
+        ]);
+
+        return redirect()->route('nhacsi.index');
     }
 
     /**
@@ -38,8 +54,12 @@ class NhacsiController extends Controller
      */
     public function show(string $id)
     {
-        //
-        return view('nhacsi.show');
+        $model = DB::table('nhacsis')->where('id', $id)->first();
+        $listAmNhac = DB::table('amnhacs')->where('id_nhacsi', $id)
+            ->join('nhacsis', 'amnhacs.id_nhacsi', '=', 'nhacsis.id')
+            ->select('amnhacs.*', 'nhacsis.ten as ten_nhacsi')
+            ->get();
+        return view('nhacsi.show', compact('model', 'listAmNhac'));
 
     }
 
@@ -48,8 +68,8 @@ class NhacsiController extends Controller
      */
     public function edit(string $id)
     {
-        //
-        return view('nhacsi.edit');
+        $model = DB::table('nhacsis')->where('id', $id)->first();
+        return view('nhacsi.edit', compact('model'));
 
     }
 
@@ -59,6 +79,21 @@ class NhacsiController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        if ($request->hasFile('image')) {
+            $url = Storage::put('nhacsi', $request->file('image'));
+        } else {
+            $url = '';
+        }
+        DB::table('nhacsis')->where('id', $id)
+            ->update([
+            'ten' => $request->ten1,
+            'anh'=> $url,
+            'ngaysinh' => $request->ngaysinh,
+            'quequan'=> $request->quequan,
+            'created_at' => Carbon::now()
+        ]);
+
+        return redirect()->route('nhacsi.index');
     }
 
     /**
@@ -66,6 +101,7 @@ class NhacsiController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::table('nhacsis')->where('id', $id)->delete();
+        return back();
     }
 }
