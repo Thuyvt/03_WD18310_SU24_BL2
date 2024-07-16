@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\NhacsiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SanPhamController;
@@ -60,3 +61,6 @@ Route::get('/nhacsi/{id}/edit', [NhacsiController::class, 'edit'])->name('nhacsi
 Route::post('/nhacsi/store', [NhacsiController::class, 'store'])->name('nhacsi.store');
 Route::put('/nhacsi/{id}/update', [NhacsiController::class, 'update'])->name('nhacsi.update');
 Route::delete('/nhacsi/{id}/destroy', [NhacsiController::class, 'destroy'])->name('nhacsi.destroy');
+
+// Route resource
+Route::resource('books', BookController::class);
