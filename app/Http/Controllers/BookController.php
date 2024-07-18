@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Author;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
+    const PATH_VIEW = 'books.';
     /**
      * Display a listing of the resource.
      */
@@ -16,7 +19,7 @@ class BookController extends Controller
         //
         $data = Book::query()->get();
 //        dd($data->author);
-        return view('books.index', compact('data'));
+        return view(self::PATH_VIEW.__FUNCTION__, compact('data'));
     }
 
     /**
@@ -24,7 +27,10 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        $authors = Author::query()->pluck('name', 'id')->all();
+//        dd($authors);
+        return view(self::PATH_VIEW.__FUNCTION__, compact('authors'));
+
     }
 
     /**
@@ -33,6 +39,16 @@ class BookController extends Controller
     public function store(StoreBookRequest $request)
     {
         //
+//        dd($request->all());
+        $data = $request->except('image');
+//        $data['is_active'] ??= 0;
+        $data['is_active'] = isset($data['is_active']) ? 1 : 0;
+        if ($request->hasFile('image')) {
+            $data['image'] = Storage::put('books', $request->file('image'));
+        }
+//        dd($data);
+        Book::query()->create($data);
+        return redirect()->route('books.index');
     }
 
     /**
@@ -40,7 +56,8 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        return view(self::PATH_VIEW.__FUNCTION__, compact('book'));
+
     }
 
     /**
@@ -48,8 +65,8 @@ class BookController extends Controller
      */
     public function edit(Book $book)
     {
-        //
-    }
+        $authors = Author::query()->pluck('name', 'id')->all();
+        return view(self::PATH_VIEW.__FUNCTION__, compact('authors', 'book'));    }
 
     /**
      * Update the specified resource in storage.
@@ -57,6 +74,22 @@ class BookController extends Controller
     public function update(UpdateBookRequest $request, Book $book)
     {
         //
+//        dd($request->all());
+        $data = $request->except('image');
+//        $data['is_active'] ??= 0;
+        $data['is_active'] = isset($data['is_active']) ? 1 : 0;
+        if ($request->hasFile('image')) {
+            $data['image'] = Storage::put('books', $request->file('image'));
+            // Xóa ảnh cũ trong storage đi
+            if (!empty($book->image) && Storage::exists($book->image)) {
+                Storage::delete($book->image);
+            }
+        } else {
+            $data['image'] = $book->image;
+        }
+//        dd($data);
+        $book->update($data);
+        return redirect()->route('books.index');
     }
 
     /**
@@ -64,6 +97,7 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        //
+        $book->delete();
+        return back();
     }
 }

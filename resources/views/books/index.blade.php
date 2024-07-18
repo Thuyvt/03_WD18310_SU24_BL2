@@ -25,7 +25,14 @@
                     <td>{{$item->name}}</td>
                     <td>{{$item->public_company}}</td>
                     <td>{{$item->author->name}}</td>
-                    <td>{{$item->image}}</td>
+                    <td>
+                        @if(!empty($item->image))
+                            <div style="width: 100px;height: 100px;">
+                                <img src="{{Storage::url($item->image)}}"
+                                     style="max-width: 100%; max-height: 100%;" alt="">
+                            </div>
+                        @endif
+                    </td>
                     <td>{{$item->quantity}}</td>
                     <td>
                         {!! $item->is_active ? '<span class="badge bg-success">Hoạt động</span>'
