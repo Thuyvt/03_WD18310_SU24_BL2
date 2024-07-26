@@ -73,6 +73,8 @@ Route::post('auth/login',
     [LoginController::class, 'login'])->name('login');
 Route::get('auth/logout',
     [LoginController::class, 'logout'])->name('logout');
+Route::get('auth/verify/{token}',
+    [LoginController::class, 'verify' ])->name('verify');
 
 Route::get('auth/register',
     [RegisterController::class, 'index'])->name('register');
