@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\NhacsiController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SanPhamController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,21 +64,22 @@ Route::put('/nhacsi/{id}/update', [NhacsiController::class, 'update'])->name('nh
 Route::delete('/nhacsi/{id}/destroy', [NhacsiController::class, 'destroy'])->name('nhacsi.destroy');
 
 // Route resource
-Route::resource('books', BookController::class);
+Route::resource('books', BookController::class)
+    ->middleware(['auth', 'verified']);
 
-Route::get('auth/login',
-    [LoginController::class, 'index'])->name('login');
-Route::post('auth/login',
-    [LoginController::class, 'login'])->name('login');
-Route::get('auth/logout',
-    [LoginController::class, 'logout'])->name('logout');
-Route::get('auth/verify/{token}',
-    [LoginController::class, 'verify' ])->name('verify');
-
-Route::get('auth/register',
-    [RegisterController::class, 'index'])->name('register');
-Route::post('auth/register',
-    [RegisterController::class, 'register'])->name('register');
+//Route::get('auth/login',
+//    [LoginController::class, 'index'])->name('login');
+//Route::post('auth/login',
+//    [LoginController::class, 'login'])->name('login');
+//Route::get('auth/logout',
+//    [LoginController::class, 'logout'])->name('logout');
+//Route::get('auth/verify/{token}',
+//    [LoginController::class, 'verify' ])->name('verify');
+//
+//Route::get('auth/register',
+//    [RegisterController::class, 'index'])->name('register');
+//Route::post('auth/register',
+//    [RegisterController::class, 'register'])->name('register');
 
 Route::get('admin', function(){
     return 'đây là admin';
@@ -87,3 +87,10 @@ Route::get('admin', function(){
 //Route::get('admin', function(){
 //    return 'đây là admin';
 //})->middleware(['auth' ,'isAdmin']);
+
+Auth::routes([
+    'verify' => true,
+//    'register' => false
+]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
